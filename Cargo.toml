@@ -1,0 +1,13 @@
+[package]
+name = "sqlite-rust-starter"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sqlite3-loadable = {path="../rust-sqlite-exts/sqlite3-loadable"}
+sqlite3ext-sys = {path="../rust-sqlite-exts/sqlite3ext-sys"}
+image = {version="0.24.4", features=["webp-encoder"]}
+
+[lib]
+crate-type=["rlib", "cdylib"]
+name = "img0"
