@@ -4,7 +4,7 @@ import time
 import os
 from PIL import Image
 
-EXT_PATH="./target/debug/libimg0"
+EXT_PATH="./dist/debug/img0"
 
 def connect(ext):
   db = sqlite3.connect(":memory:")

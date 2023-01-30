@@ -1,4 +1,4 @@
-.load target/release/libimg0
+ .load target/release/libimg0
 .timer on
 
 .header on

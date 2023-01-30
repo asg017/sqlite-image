@@ -1,21 +1,18 @@
 use std::io::Cursor;
 
 use image::{io::Reader, DynamicImage, ImageBuffer, ImageFormat, ImageOutputFormat, Luma, Rgba};
-use sqlite3_loadable::{
-    api::{context_result_blob, value_blob},
-    errors::Result,
-    sqlite3_context, sqlite3_value, Error,
-};
+use sqlite_loadable::prelude::*;
+use sqlite_loadable::{api, Error, Result};
 use std::io::{Read, Seek};
 
-pub fn load_image(value: *mut sqlite3_value) -> Result<(DynamicImage, Option<ImageFormat>)> {
-    let raw = value_blob(value);
+pub fn load_image(value: &*mut sqlite3_value) -> Result<(DynamicImage, Option<ImageFormat>)> {
+    let raw = api::value_blob(value);
     let reader = Reader::new(Cursor::new(raw)).with_guessed_format().unwrap();
-    let format = reader.format().clone();
-    let image = reader.decode().map_err(|err| {
-        Error::new_message(format!("Error decoding image: {}", err.to_string()).as_str())
-    })?;
-    Ok((image.to_owned(), format))
+    let format = reader.format();
+    let image = reader
+        .decode()
+        .map_err(|err| Error::new_message(format!("Error decoding image: {}", err).as_str()))?;
+    Ok((image, format))
 }
 
 pub fn result_dynamic_image_as(
@@ -34,7 +31,7 @@ pub fn result_dynamic_image_as(
         .map_err(|_| Error::new_message("Erroring seeking in-memory cursor"))?;
     c.read_to_end(&mut buffer).unwrap();
 
-    context_result_blob(context, &buffer.as_slice());
+    api::result_blob(context, buffer.as_slice());
     Ok(())
 }
 
@@ -55,7 +52,7 @@ pub fn result_imagebuffer_as(
     c.read_to_end(&mut buffer)
         .map_err(|_| Error::new_message("Erroring reading in-memory cursor"))?;
 
-    context_result_blob(context, &buffer.as_slice());
+    api::result_blob(context, buffer.as_slice());
     Ok(())
 }
 
@@ -77,6 +74,6 @@ pub fn result_imagebuffer_luma_as(
     c.read_to_end(&mut buffer)
         .map_err(|_| Error::new_message("Erroring reading in-memory cursor"))?;
 
-    context_result_blob(context, &buffer.as_slice());
+    api::result_blob(context, buffer.as_slice());
     Ok(())
 }
